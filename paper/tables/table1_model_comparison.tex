@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\caption{Performance comparison between Unimodal Baselines, Early Feature-Level Fusion, and Late Decision-Level Fusion on the 2024-2025 Out-of-Time Test Set in the Brazilian Cerrado.}
+\label{tab:model_comparison}
+\begin{tabular}{llrrrrrr}
+\toprule
+Paradigm & Model Architecture & Accuracy & Precision & Recall & F1-Score & ROC-AUC & PR-AUC \\
+\midrule
+Early Feature Fusion & RandomForest & 1.000000 & 1.000000 & 1.000000 & 1.000000 & 1.000000 & 1.000000 \\
+Late Decision Fusion & MetaLearnerStacking & 0.999800 & 0.999800 & 0.998700 & 0.999300 & 1.000000 & 1.000000 \\
+Early Feature Fusion & XGBoost & 0.999600 & 0.998000 & 0.999100 & 0.998600 & 1.000000 & 1.000000 \\
+Early Feature Fusion & LightGBM & 0.999000 & 0.995200 & 0.997100 & 0.996200 & 1.000000 & 1.000000 \\
+Late Decision Fusion & WeightedSoftVoting & 0.997800 & 0.999800 & 0.982900 & 0.991300 & 1.000000 & 0.999800 \\
+Late Decision Fusion & DempsterShafer & 0.989200 & 1.000000 & 0.914100 & 0.955100 & 1.000000 & 1.000000 \\
+Single-Source Baseline & WeatherOnly & 0.950200 & 0.720600 & 0.985400 & 0.832400 & 0.968400 & 0.723700 \\
+Single-Source Baseline & FireHistoryOnly & 0.878000 & 1.000000 & 0.028400 & 0.055200 & 0.514200 & 0.150400 \\
+Single-Source Baseline & LandUseOnly & 0.874500 & 0.000000 & 0.000000 & 0.000000 & 0.654500 & 0.172300 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,34 @@
+# ==============================================================================
+# LAFusion 2026 - Spatio-Temporal Information Fusion Framework for Wildfire Risk
+# Dependencies File
+# ==============================================================================
+
+# Core Data Manipulation & Computation
+numpy>=1.24.0
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# Geospatial Processing & Coordinates
+shapely>=2.0.0
+geopandas>=0.14.0
+pyproj>=3.6.0
+geopy>=2.4.0
+
+# Machine Learning & Information Fusion Models
+scipy>=1.10.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+lightgbm>=4.0.0
+
+# Scientific Explainability & Interpretability (Shapley Values)
+shap>=0.44.0
+
+# Scientific Visualization & Cartography (300 DPI Figures)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+folium>=0.14.0
+
+# Ingestion, HTTP Requests & Progress Tracking
+requests>=2.31.0
+urllib3>=2.0.0
+tqdm>=4.66.0
