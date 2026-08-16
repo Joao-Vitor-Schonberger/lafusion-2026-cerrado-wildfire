@@ -2,8 +2,9 @@
 
 **Arquivo de Contexto & Memória do Projeto**  
 **Data de Criação:** 16 de Agosto de 2026  
-**Última Atualização:** 16 de Agosto de 2026 (Fases 1, 2, 3 e 4 Concluídas)  
+**Última Atualização:** 16 de Agosto de 2026 (Fases 1 a 5 Concluídas | Repositório Publicado no GitHub)  
 **Repositório / Diretório Local:** `C:\Users\joaos\OneDrive\Documentos\2026\01_Academico_e_UFG\Trabalhos\LaFusion`  
+**Repositório GitHub Oficial:** [https://github.com/Joao-Vitor-Schonberger/lafusion-2026-cerrado-wildfire](https://github.com/Joao-Vitor-Schonberger/lafusion-2026-cerrado-wildfire)  
 
 ---
 
@@ -41,22 +42,16 @@
 
 ---
 
-## 4. Resultados e Figuras Científicas Geradas (Fase 4 Concluída)
+## 4. Resultados e Figuras Científicas Geradas
 
 Todas as figuras foram geradas no padrão de publicação **300 DPI (PNG e PDF vetorial)** em `paper/figures/`:
 
-1. **Figura 1: [fig1_shap_summary_beeswarm.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig1_shap_summary_beeswarm.png)**:
-   * *SHAP Summary Beeswarm Plot* comprovando o impacto e a direção de cada feature (FWI proxy, secura acumulada de 7 dias, umidade mínima < 20% e índice de inflamabilidade do solo).
-2. **Figura 2: [fig2_shap_feature_importance_bar.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig2_shap_feature_importance_bar.png)**:
-   * Ranking de importância global média absoluta via TreeSHAP.
-3. **Figura 3: [fig3_roc_curves_comparison.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig3_roc_curves_comparison.png)**:
-   * Curvas ROC comparativas dos 9 modelos (AUC de 1.0000 para fusão vs 0.5142 para histórico de satélite isolado).
-4. **Figura 4: [fig4_precision_recall_curves.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig4_precision_recall_curves.png)**:
-   * Curvas Precision-Recall demonstrando a superioridade da fusão em dados desbalanceados.
-5. **Figura 5: [fig5_spatiotemporal_wildfire_risk_map_goias.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig5_spatiotemporal_wildfire_risk_map_goias.png)**:
-   * Estudo de caso cartográfico espacial em Goiás/DF durante o pico de estiagem (agosto/setembro de 2024).
-6. **Figura 6: [fig6_confusion_matrices_comparison.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig6_confusion_matrices_comparison.png)**:
-   * Matrizes de confusão normalizadas comprovando que a fusão elimina os 28% de falsos alarmes do modelo univariado de clima.
+1. **Figura 1: [fig1_shap_summary_beeswarm.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig1_shap_summary_beeswarm.png)**
+2. **Figura 2: [fig2_shap_feature_importance_bar.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig2_shap_feature_importance_bar.png)**
+3. **Figura 3: [fig3_roc_curves_comparison.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig3_roc_curves_comparison.png)**
+4. **Figura 4: [fig4_precision_recall_curves.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig4_precision_recall_curves.png)**
+5. **Figura 5: [fig5_spatiotemporal_wildfire_risk_map_goias.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig5_spatiotemporal_wildfire_risk_map_goias.png)**
+6. **Figura 6: [fig6_confusion_matrices_comparison.png](file:///C:/Users/joaos/OneDrive/Documentos/2026/01_Academico_e_UFG/Trabalhos/LaFusion/paper/figures/fig6_confusion_matrices_comparison.png)**
 
 ---
 
@@ -66,7 +61,7 @@ Todas as figuras foram geradas no padrão de publicação **300 DPI (PNG e PDF v
 - [x] **Fase 2: Engenharia de Dados (Ingestão & Alinhamento Espaço-Temporal) (CONCLUÍDA)**
 - [x] **Fase 3: Desenvolvimento dos Modelos e Algoritmos de Fusão (CONCLUÍDA)**
 - [x] **Fase 4: Experimentação Científica, Métricas & Explicabilidade (CONCLUÍDA)**
-  - 6 figuras científicas em alta resolução (300 DPI) e código LaTeX gerados em `paper/figures/` e `paper/tables/`.
-- [ ] **Fase 5: Redação Técnica do Artigo (Springer CCIS - 12 páginas) (PRÓXIMO PASSO)**
-  - Escrita do manuscrito completo em inglês acadêmico no template oficial da Springer.
-- [ ] **Fase 6: QA Double-Blind e Submissão no Microsoft CMT**
+- [x] **Fase 5: Redação Técnica do Artigo (Springer CCIS - 12 páginas) (CONCLUÍDA)**
+  - Manuscrito formal em LaTeX (`paper/main_paper.tex`), versão em Markdown (`paper/MANUSCRITO_COMPLETO_12_PAGINAS.md`) e repositório oficial publicado no GitHub.
+- [ ] **Fase 6: QA Double-Blind e Submissão no Microsoft CMT (PRÓXIMO PASSO)**
+  - Auditoria de anonimato final e submissão na plataforma Microsoft CMT até 04/09/2026.

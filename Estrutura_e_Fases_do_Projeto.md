@@ -4,8 +4,7 @@
 **Projeto:** *A Spatio-Temporal Information Fusion Framework for Severe Wildfire Risk Prediction in the Brazilian Cerrado*  
 **Evento Alvo:** LAFusion 2026 (*Fourth Latin American Workshop on Information Fusion* — Springer CCIS)  
 **Diretório do Projeto:** `C:\Users\joaos\OneDrive\Documentos\2026\01_Academico_e_UFG\Trabalhos\LaFusion`  
-**Horizonte Temporal:** 10 Anos (2016–2025) | 12 Meses por Ano  
-**Recorte Geográfico:** Estado de Goiás e DF (Bioma Cerrado)  
+**Repositório GitHub:** [https://github.com/Joao-Vitor-Schonberger/lafusion-2026-cerrado-wildfire](https://github.com/Joao-Vitor-Schonberger/lafusion-2026-cerrado-wildfire)  
 
 ---
 
@@ -48,9 +47,9 @@ O projeto combina **Engenharia de Dados**, **Ciência de Dados (Machine Learning
                     └──────────────────────┬───────────────────────┘
                                            ▼
                     ┌──────────────────────────────────────────────┐
-                    │      FASE 5: REDAÇÃO DO ARTIGO (12 PÁGS)     │
-                    │ - Template Springer CCIS (LaTeX & Word)      │
-                    │ - Escrita formal em Inglês Acadêmico         │
+                    │  FASE 5: REDAÇÃO E SUBMISSÃO (CONCLUÍDA)     │
+                    │ - Template Springer CCIS (LaTeX & Markdown)  │
+                    │ - Repositório Oficial Publicado no GitHub    │
                     └──────────────────────┬───────────────────────┘
                                            ▼
                     ┌──────────────────────────────────────────────┐
@@ -62,36 +61,6 @@ O projeto combina **Engenharia de Dados**, **Ciência de Dados (Machine Learning
 
 ---
 
-## 📅 2. Detalhamento das Fases e Status
-
-### 🔹 FASE 1: Planejamento, Arquitetura & Setup do Ambiente
-* **Status:** **CONCLUÍDA** ✅
-
-### 🔹 FASE 2: Engenharia de Dados (Ingestão & Alinhamento Espaço-Temporal)
-* **Status:** **CONCLUÍDA** ✅
-
-### 🔹 FASE 3: Desenvolvimento dos Modelos e Algoritmos de Fusão
-* **Status:** **CONCLUÍDA** ✅
-
-### 🔹 FASE 4: Experimentação Científica, Métricas & Explicabilidade
-* **Status:** **CONCLUÍDA** ✅
-* **Resultados e Figuras Geradas (300 DPI em `paper/figures/`):**
-  1. `fig1_shap_summary_beeswarm.png` (.pdf)
-  2. `fig2_shap_feature_importance_bar.png` (.pdf)
-  3. `fig3_roc_curves_comparison.png` (.pdf)
-  4. `fig4_precision_recall_curves.png` (.pdf)
-  5. `fig5_spatiotemporal_wildfire_risk_map_goias.png` (.pdf)
-  6. `fig6_confusion_matrices_comparison.png` (.pdf)
-
-### 🔹 FASE 5: Redação Técnica do Artigo (Springer CCIS — 12 Páginas)
-* **Status:** **PRÓXIMO PASSO** ⏳
-* **Objetivo:** Redigir o artigo científico completo em inglês formal no template oficial da Springer.
-
-### 🔹 FASE 6: QA (Auditoria Double-Blind) & Submissão Microsoft CMT
-* **Status:** Aguardando Fase 5 (Prazo: 04/09/2026)
-
----
-
 ## 🏁 Tabela Resumo do Cronograma de Fases
 
 | Fase | Foco Principal | Tempo Estimado | Status |
@@ -100,5 +69,5 @@ O projeto combina **Engenharia de Dados**, **Ciência de Dados (Machine Learning
 | **Fase 2** | Ingestão e Engenharia de Dados (ETL) | Dias 2 a 4 | **CONCLUÍDA** ✅ |
 | **Fase 3** | Modelos e Algoritmos de Fusão | Dias 5 a 7 | **CONCLUÍDA** ✅ |
 | **Fase 4** | Experimentação, Métricas e SHAP | Dias 8 a 9 | **CONCLUÍDA** ✅ |
-| **Fase 5** | Redação do Artigo (12 páginas) | Dias 10 a 14 | **PRÓXIMO PASSO** ⏳ |
-| **Fase 6** | QA Double-Blind e Submissão CMT | Dias 15 a 16 (Antes de 04/09) | Aguardando |
+| **Fase 5** | Redação do Artigo & Publicação no GitHub | Dias 10 a 14 | **CONCLUÍDA** ✅ |
+| **Fase 6** | QA Double-Blind e Submissão CMT | Dias 15 a 16 (Antes de 04/09) | **PRÓXIMO PASSO** ⏳ |
