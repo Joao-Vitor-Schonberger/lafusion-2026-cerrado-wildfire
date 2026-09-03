@@ -12,12 +12,13 @@
 \usepackage{hyperref}
 \usepackage{microtype}
 \usepackage{multirow}
+\usepackage{subcaption}
 
 \begin{document}
 %
-\title{A Spatio-Temporal Information Fusion Framework for Severe Wildfire Risk Prediction in the Brazilian Cerrado}
+\title{A Spatio-Temporal Information Fusion Framework and Evidential Benchmark for Multi-Horizon Wildfire Risk Forecasting in the Brazilian Cerrado}
 %
-\titlerunning{Spatio-Temporal Information Fusion for Wildfire Prediction}
+\titlerunning{Information Fusion for Multi-Horizon Wildfire Forecasting in the Cerrado}
 %
 % Double-Blind Anonymized Authors for Peer Review
 \author{Anonymous Author(s)\inst{1}}
@@ -28,172 +29,262 @@
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Wildfires in the Brazilian Cerrado pose severe environmental, agricultural, and socio-economic hazards, particularly during the prolonged dry season (June to October). Existing monitoring systems are predominantly reactive, relying on satellite thermal detections after ignition occurs, while isolated meteorological models yield unacceptable false-alarm rates by omitting vegetation fuel and spatial vulnerability. This paper proposes a unified Spatio-Temporal Information Fusion Framework that integrates three heterogeneous data streams: (i) 10-year satellite active fire records from INPE/NASA (66,010 detections), (ii) surface meteorological observations from 15 INMET weather stations (54,795 daily series), and (iii) MapBiomas land cover combustibility mappings over a $0.10^\circ$ spatial grid. We formulate and empirically evaluate Early Feature-Level Fusion (XGBoost, LightGBM, Random Forest) against Late Decision-Level Fusion grounded in Dempster-Shafer Evidence Theory (DST) and Meta-Learner Stacking on an Out-of-Time test set (2024--2025; 44,591 spatio-temporal samples). Experimental results demonstrate that multimodal information fusion significantly outperforms single-source baselines, achieving an F1-Score of 1.0000 (Random Forest) and 0.9993 (Meta-Learner Stacking), while Dempster-Shafer fusion eliminates false alarms (100\% Precision, 0.9551 F1-Score) compared to the weather-only baseline (72.06\% Precision). TreeSHAP interpretability confirms that the conjunction of Fire Weather Index proxies, 7-day cumulative dryness, and pasture biomass governs wildfire triggers in the Cerrado.
+Wildfires in the Brazilian Cerrado represent a catastrophic environmental, ecological, and economic hazard, driven by prolonged seasonal droughts where relative humidity drops below 15\%. Operational early-warning systems remain hindered by two systemic shortcomings: reactive satellite detections with intrinsic observation latency, and unimodal meteorological alarms that produce severe false-positive rates by ignoring fuel combustibility. This study presents a rigorous Spatio-Temporal Information Fusion Framework and benchmark that integrates three heterogeneous data streams across a 10-year horizon (2016--2025; 222,650 aligned observations) over the State of Goi\'as and the Federal District: surface meteorological dynamics from automatic weather stations, land use and fuel flammability mappings, and antecedent satellite thermal memory. We systematically formulate and evaluate Early Feature-Level Fusion (Gradient Boosted Trees and Random Forests) against Late Decision-Level Fusion grounded in Dempster-Shafer Evidence Theory (DST) featuring dynamic spatial discounting. Evaluated under a strict Out-of-Time test protocol (2024--2025; 44,408 test samples) across multi-horizon proactive lead times (24h, 48h, and 72h), multimodal fusion substantially outperforms unimodal baselines. Early Fusion via LightGBM and XGBoost achieves peak overall balance (F1-score of 0.6774 and 0.6754; ROC-AUC of 0.9546), whereas Dempster-Shafer evidential fusion delivers maximum precision (73.33\% to 74.76\%), effectively suppressing operational false alarms. TreeSHAP interpretability isolates the compound non-linear triggers governing wildfire occurrence, proving that proactive fusion provides a reliable foundation for civil defense and environmental governance.
 
-\keywords{Information Fusion \and Wildfire Risk Prediction \and Dempster-Shafer Evidence Theory \and Spatio-Temporal Modeling \and Brazilian Cerrado \and Explainable AI (XAI).}
+\keywords{Information Fusion \and Wildfire Risk Forecasting \and Dempster-Shafer Evidence Theory \and Multi-Horizon Prediction \and Brazilian Cerrado \and Explainable AI.}
 \end{abstract}
 
-%
 % ------------------------------------------------------------------------------
 \section{Introduction}
 \label{sec:intro}
 % ------------------------------------------------------------------------------
-The Brazilian Savanna (\textit{Cerrado}) is recognized as the world's most biodiverse tropical savanna, encompassing over 2 million square kilometers and serving as the primary agricultural powerhouse of South America. However, extreme climatic seasonality, characterized by severe drought periods from June to October where atmospheric relative humidity frequently drops below 15\%, renders the biome exceptionally susceptible to catastrophic wildfires.
+The Brazilian Savanna (\textit{Cerrado}) is recognized as the world's most biodiverse tropical savanna, spanning over 2 million square kilometers. Despite its critical role in continental water recharge and global food security, the biome is increasingly vulnerable to severe wildfires during its prolonged dry season (June to October), when atmospheric relative humidity frequently plummets below 15\% and wind gusts reach critical thresholds~\cite{pivello2021cerrado}.
 
-Despite extensive investments in environmental monitoring, operational wildfire governance remains hindered by two fundamental limitations:
+Operational monitoring systems currently deployed by civil protection and environmental defense agencies remain constrained by two fundamental trade-offs:
 \begin{enumerate}
-    \item \textbf{High Latency and Reversibility Constraints:} Satellite remote sensing instruments (e.g., MODIS, VIIRS) operate reactively, registering thermal anomalies only after fires have propagated across significant land areas.
-    \item \textbf{High False-Alarm Rates in Unimodal Models:} Warning systems driven exclusively by surface meteorological indices produce high false-positive rates because they fail to account for spatial heterogeneity, vegetation moisture retention, fuel biomass density, and human proximity.
+    \item \textbf{Observation Latency of Satellite Detections:} Spaceborne sensors (e.g., MODIS, VIIRS) operate predominantly in a reactive capacity, registering thermal anomalies only after ignition and significant spatial propagation have already occurred~\cite{inpe2025}.
+    \item \textbf{Alarmist False-Positive Rates in Meteorology-Only Models:} Systems based solely on atmospheric indices (e.g., Canadian FWI or Angstr\"om Index) produce excessive false alarms because they assume uniform flammability, failing to account for fuel moisture, vegetative biomass density, agricultural fire breaks, and spatial distance from ignition triggers~\cite{van2018fire}.
 \end{enumerate}
 
-To overcome these challenges, this study introduces an end-to-end \textbf{Spatio-Temporal Information Fusion Framework} designed to deliver proactive (24h--72h) wildfire risk forecasts across the State of Goi\'as and the Federal District. The core contributions of this work are threefold:
+To bridge this operational divide, this paper proposes an end-to-end \textbf{Spatio-Temporal Information Fusion Framework} that reconciles heterogeneous environmental streams to provide proactive (24h to 72h) wildfire risk forecasts across the State of Goi\'as and the Federal District. The primary contributions of this work are:
 \begin{itemize}
-    \item \textbf{Multimodal Integration Pipeline:} Ingestion and temporal alignment of a 10-year comprehensive corpus (2016--2025, 12 months/year; 222,833 samples) combining remote sensing, meteorological stations, and cartographic fuel mappings.
-    \item \textbf{Comparative Fusion Paradigms:} Systematic evaluation of Early Feature-Level Fusion (Gradient Boosting and Ensembles) versus Late Decision-Level Fusion utilizing \textbf{Dempster-Shafer Evidence Theory (DST)}, Weighted Soft-Voting, and Stacking.
-    \item \textbf{Explainable AI (XAI) and Cartographic Validation:} Application of TreeSHAP to uncover the non-linear feature interactions governing fire ignition, supported by a 2024 peak-drought spatial case study.
+    \item \textbf{A Leakage-Free Spatio-Temporal Benchmark:} Construction and temporal alignment of a 10-year multi-source corpus (2016--2025, 222,650 grid observations at $0.10^\circ \approx 11\,\text{km}$ resolution), enforcing strict separation between past predictor features up to time $t$ and future active wildfire occurrences at $t+1$, $t+2$, and $t+3$.
+    \item \textbf{Comparative Multimodal Fusion Paradigms:} Systematic empirical comparison of Early Feature-Level Fusion (XGBoost, LightGBM, Random Forest) against Late Decision-Level Fusion utilizing \textbf{Dempster-Shafer Evidence Theory (DST)} equipped with dynamic spatial discounting, Weighted Soft-Voting, and Meta-Learner Stacking.
+    \item \textbf{Multi-Horizon and Explainability Analysis:} Quantification of forecast degradation across 24h, 48h, and 72h lead times, complemented by TreeSHAP explainable AI (XAI) and cartographic risk validations on the out-of-time test set (2024--2025).
 \end{itemize}
 
-%
 % ------------------------------------------------------------------------------
-\section{Related Work}
-\label{sec:related}
+\section{Theoretical Foundations of Evidential Information Fusion}
+\label{sec:theory}
 % ------------------------------------------------------------------------------
-Traditional wildfire danger estimation relies heavily on semi-empirical meteorological indexes, such as the Canadian Fire Weather Index (FWI) and the Nesterov Index. While effective in homogeneous boreal biomes, their direct transposition to tropical savannas often yields poor discrimination between irrigated agricultural zones and highly combustible degraded pastures.
+According to the Joint Directors of Laboratories (JDL) data fusion model, information fusion can be conceptualized at multiple hierarchical tiers. While Level~1 (Early Fusion) concatenates raw or engineered features into a unified vector space, Level~2 (Late Decision Fusion) combines autonomous inferences from specialized domain classifiers, offering superior robustness in the presence of conflicting or missing sensor modalities~\cite{hall2001handbook}.
 
-Recent advances in machine learning have explored convolutional neural networks (CNNs) and recurrent architectures (LSTMs) for spatio-temporal modeling. However, most existing literature focuses either purely on satellite image segmentation or on tabular climate regression. Studies investigating explicit mathematical information fusion---specifically the treatment of conflicting evidence and sensor uncertainty via Dempster-Shafer Theory or multi-agent decision consensus---remain scarce in the context of South American biomes. This work bridges this gap by directly comparing feature-level concatenation against formal evidential decision fusion.
+\subsection{Dempster-Shafer Evidence Theory}
+Dempster-Shafer Theory (DST) provides a generalized mathematical framework for modeling epistemic uncertainty and belief under ignorance~\cite{shafer1976,dempster1967}. Let $\Omega = \{\text{Fire}, \neg\text{Fire}\}$ represent the binary frame of discernment. A Basic Belief Assignment (BBA), or mass function, maps the power set $2^\Omega \to [0, 1]$ satisfying:
+\begin{equation}
+    m(\emptyset) = 0, \quad \sum_{A \subseteq \Omega} m(A) = 1
+\end{equation}
 
-%
+For an individual sensor or classifier $i$ producing probability $p_i \in [0, 1]$ with an operational reliability factor $\alpha_i \in (0, 1]$, the evidentially discounted mass distribution is formulated as:
+\begin{equation}
+    m_i(\{\text{Fire}\}) = \alpha_i \cdot p_i, \quad m_i(\{\neg\text{Fire}\}) = \alpha_i \cdot (1 - p_i), \quad m_i(\Omega) = 1 - \alpha_i
+\end{equation}
+where $m_i(\Omega)$ explicitly quantifies total epistemic ignorance.
+
+\subsection{Orthogonal Combination and Decision Rule}
+Given two independent evidence sources $m_1$ and $m_2$, Dempster's rule of combination yields the joint mass $m_{12}$:
+\begin{equation}
+    m_{12}(A) = \frac{1}{1 - K} \sum_{B \cap C = A} m_1(B) m_2(C), \quad \forall A \neq \emptyset
+\end{equation}
+where $K$ measures the degree of evidential conflict:
+\begin{equation}
+    K = m_1(\{\text{Fire}\}) m_2(\{\neg\text{Fire}\}) + m_1(\{\neg\text{Fire}\}) m_2(\{\text{Fire}\})
+\end{equation}
+Associativity allows recursive combination of arbitrary sources: $m_{123} = (m_1 \oplus m_2) \oplus m_3$. The fused decision probability is extracted via the Pignistic transformation~\cite{smets1994transferable}:
+\begin{equation}
+    \text{BetP}(\text{Fire}) = m_{123}(\{\text{Fire}\}) + \frac{1}{2} m_{123}(\Omega)
+\end{equation}
+
 % ------------------------------------------------------------------------------
 \section{Proposed Spatio-Temporal Information Fusion Framework}
 \label{sec:framework}
 % ------------------------------------------------------------------------------
 
-\subsection{Spatio-Temporal Grid Formulation}
-Let the target geographical region $\mathcal{G} \subset \mathbb{R}^2$ encompassing the State of Goi\'as and the Federal District (latitude $[-19.50^\circ, -12.30^\circ]$, longitude $[-53.30^\circ, -45.90^\circ]$) be partitioned into a uniform regular grid of spatial cells $c_k \in \mathcal{C}$ with spatial resolution $\Delta \theta = 0.10^\circ \approx 11\,\text{km}$. The temporal dimension $t \in \mathcal{T} = \{1, \dots, T\}$ spans daily intervals from January 1, 2016 to December 31, 2025 ($T = 3{,}652$ days).
+\subsection{Spatio-Temporal Grid and Multi-Source Modalities}
+The target geographic domain $\mathcal{G} \subset \mathbb{R}^2$ encompassing Goi\'as and DF (latitudes $[-19.50^\circ, -12.30^\circ]$, longitudes $[-53.30^\circ, -45.90^\circ]$) is discretized into regular spatial cells $c_k \in \mathcal{C}$ ($\Delta \theta = 0.10^\circ \approx 11\,\text{km}$). The temporal corpus spans daily intervals $t \in \{1, \dots, 3{,}652\}$ across the 10-year period (2016--2025).
 
-\subsection{Multimodal Data Sources}
-For each cell-day tuple $(c_k, t)$, the framework ingests three heterogeneous feature subsets:
+At each cell-day $(c_k, t)$, three heterogeneous modalities are aligned:
 \begin{enumerate}
-    \item \textbf{Meteorological Dynamics $\mathbf{x}_{\text{weather}}(c_k, t)$:} Daily maximum temperature $T_{\max}$, mean temperature $T_{\text{mean}}$, minimum relative humidity $H_{\min}$, wind gusts $W_{\text{gust}}$, precipitation $P$, and consecutive dry days $D_{\text{dry}}$, coupled with 3-day and 7-day rolling aggregates.
-    \item \textbf{Land Cover \& Fuel Biomass $\mathbf{x}_{\text{landuse}}(c_k)$:} Dominant vegetation class, flammability index $I_{\text{flam}} \in [0.05, 0.90]$, biomass load $B_{\text{fuel}}$ (t/ha), and distance to agricultural edges $D_{\text{edge}}$.
-    \item \textbf{Satellite Remote Sensing $\mathbf{x}_{\text{sat}}(c_k, t)$:} Active fire counts $N_{\text{fire}}$ and Fire Radiative Power $\text{FRP}_{\max}$ (MW) derived from MODIS and VIIRS sensors.
+    \item \textbf{Dynamic Meteorology $\mathbf{x}_{\text{weather}}(c_k, t)$:} Daily maximum and mean temperatures ($T_{\max}, T_{\text{mean}}$), minimum relative humidity ($H_{\min}$), wind gust velocity ($W_{\text{gust}}$), precipitation, consecutive dry days ($D_{\text{dry}}$), and rolling cumulative drought windows (3-day and 7-day averages).
+    \item \textbf{Land Cover \& Combustible Biomass $\mathbf{x}_{\text{landuse}}(c_k)$:} Dominant vegetation class, flammability rating $I_{\text{flam}} \in [0.05, 0.90]$, fuel load $B_{\text{fuel}}$ (t/ha), distance to transport infrastructure $D_{\text{road}}$, and anthropic exposure.
+    \item \textbf{Antecedent Satellite Memory $\mathbf{x}_{\text{sat\_lag}}(c_k, t)$:} Thermal detections strictly prior to time $t$ ($N_{\text{fire}}(t-1)$, $N_{\text{fire}}(t-2)$, 3-day sum, and previous maximum Fire Radiative Power $\text{FRP}_{\max}(t-1)$ in MW).
 \end{enumerate}
 
-\subsection{Early Feature-Level Fusion}
-In Early Fusion, the heterogeneous observations are concatenated into a joint vector:
+\subsection{Physical Index Formulation}
+To incorporate thermodynamic fire spread principles into the feature space without inducing target circularity, we formulate the Fire Weather Index proxy:
 \begin{equation}
-    \mathbf{z}(c_k, t) = \left[ \mathbf{x}_{\text{weather}}(c_k, t) \,\|\, \mathbf{x}_{\text{landuse}}(c_k) \,\|\, \mathbf{x}_{\text{sat}}(c_k, t) \,\|\, \mathbf{\phi}_{\text{phys}}(c_k, t) \right] \in \mathbb{R}^{45}
+    \text{FWI}_{\text{proxy}}(c_k, t) = \frac{T_{\max}(c_k, t) \cdot W_{\text{gust}}(c_k, t)}{H_{\min}(c_k, t) + 1.0}
 \end{equation}
-where $\mathbf{\phi}_{\text{phys}}$ encodes domain-specific physical interactions, including the Fire Weather Index proxy:
+and the Fuel-Dryness Interaction Index:
 \begin{equation}
-    \text{FWI}_{\text{proxy}} = \frac{T_{\max} \cdot W_{\text{gust}}}{H_{\min} + 1.0}
-\end{equation}
-Classifiers (XGBoost, LightGBM, and Random Forest) map $\mathbf{z}(c_k, t) \to P(y = 1 \mid \mathbf{z})$.
-
-\subsection{Late Decision-Level Fusion via Dempster-Shafer Evidence Theory}
-In Late Fusion, three independent domain specialists output probability estimates $p_w, p_l, p_s \in [0, 1]$ for the frame of discernment $\Omega = \{\text{Fire}, \neg\text{Fire}\}$. 
-
-For each source $i \in \{w, l, s\}$ with reliability factor $\alpha_i \in (0, 1]$, the Basic Belief Assignment (BBA) is constructed as:
-\begin{equation}
-    m_i(\{\text{Fire}\}) = \alpha_i \cdot p_i, \quad m_i(\{\neg\text{Fire}\}) = \alpha_i \cdot (1 - p_i), \quad m_i(\Omega) = 1 - \alpha_i
-\end{equation}
-where $m_i(\Omega)$ explicitly represents epistemic uncertainty.
-
-Two independent belief structures $m_1$ and $m_2$ are fused via Dempster's rule of combination:
-\begin{equation}
-    m_{12}(A) = \frac{1}{1 - K} \sum_{B \cap C = A} m_1(B) m_2(C), \quad \forall A \neq \emptyset
-\end{equation}
-where the conflict metric $K$ is defined by:
-\begin{equation}
-    K = m_1(\{\text{Fire}\}) m_2(\{\neg\text{Fire}\}) + m_1(\{\neg\text{Fire}\}) m_2(\{\text{Fire}\})
-\end{equation}
-The final decision probability is obtained through the Pignistic transformation:
-\begin{equation}
-    \text{BetP}(\text{Fire}) = m_{123}(\{\text{Fire}\}) + \frac{1}{2} m_{123}(\Omega)
+    I_{\text{inter}}(c_k, t) = I_{\text{flam}}(c_k) \cdot \left(\frac{100.0 - H_{\min}(c_k, t)}{100.0}\right)
 \end{equation}
 
-%
-% ------------------------------------------------------------------------------
-\section{Experimental Setup and Datasets}
-\label{sec:experiments}
-% ------------------------------------------------------------------------------
-\subsection{Data Partitioning and Protocol}
-To evaluate model generalization without temporal data leakage, an **Out-of-Time validation strategy** is enforced:
+\subsection{Dynamic Evidential Discounting in Dempster-Shafer Fusion}
+Unlike conventional static reliability parameters, we formulate a \textbf{Dynamic Evidential Discounting} mechanism:
 \begin{itemize}
-    \item \textbf{Training Set (2016--2023):} 8 consecutive years containing $178{,}242$ spatio-temporal samples ($20{,}570$ severe fire instances; $11.54\%$).
-    \item \textbf{Test Set (2024--2025):} 2 full unseen years containing $44{,}591$ spatio-temporal samples ($5{,}598$ severe fire instances; $12.55\%$).
+    \item \textbf{Spatial Weather Discounting:} The reliability of meteorological estimates decays exponentially as a function of the cell's distance $d_k$ to the nearest weather station:
+    \begin{equation}
+        \alpha_w(c_k) = \max\left(0.50, \min\left(0.95, \, 0.92 \cdot \exp\left(-\frac{d_k}{150\,\text{km}}\right)\right)\right)
+    \end{equation}
+    \item \textbf{Temporal Satellite Memory Discounting:} Antecedent thermal anomalies carry decaying evidential weight as the forecasting horizon $h \in \{1, 2, 3\}$ increases:
+    \begin{equation}
+        \alpha_s(h) = \max\left(0.65, \, 0.90 \cdot \exp(-0.20 \cdot (h - 1))\right)
+    \end{equation}
+    \item \textbf{Fuel Flammability Reliability:} Constant baseline $\alpha_l = 0.82$.
 \end{itemize}
 
-\subsection{Evaluation Metrics}
-Models are quantitatively assessed across Accuracy, Precision, Recall, F1-Score, Area Under the ROC Curve (ROC-AUC), and Area Under the Precision-Recall Curve (PR-AUC).
+\subsection{Non-Circular Multi-Horizon Target Definition}
+A severe wildfire event is registered in cell $c_k$ on day $t$ if spaceborne sensors detect multiple concurrent fire pixels ($N_{\text{fire}} \ge 2$) or a high-intensity fire front ($\text{FRP}_{\max} \ge 35.0\,\text{MW}$). The multi-horizon predictive targets are strictly shifted forward:
+\begin{equation}
+    Y_{24h}(c_k, t) = \text{Event}(c_k, t+1), \quad Y_{48h}(c_k, t) = \text{Event}(c_k, t+2), \quad Y_{72h}(c_k, t) = \text{Event}(c_k, t+3)
+\end{equation}
+This guarantees zero temporal data leakage, as all input features belong to $\tau \le t$.
 
-%
 % ------------------------------------------------------------------------------
-\section{Results and Discussion}
+\section{Experimental Setup and Evaluation Protocol}
+\label{sec:experiments}
+% ------------------------------------------------------------------------------
+\subsection{Data Partitioning}
+To mirror real-world operational deployment and prevent temporal autocorrelation leakage, we implement an \textbf{Out-of-Time split}:
+\begin{itemize}
+    \item \textbf{Training Set (2016--2023):} 8 consecutive historical years comprising $178{,}242$ spatio-temporal observations ($15{,}872$ positive severe events; $8.90\%$).
+    \item \textbf{Test Set (2024--2025):} 2 full unseen years comprising $44{,}408$ spatio-temporal observations ($4{,}213$ positive severe events; $9.49\%$).
+\end{itemize}
+
+\subsection{Evaluated Models}
+We evaluate nine model configurations:
+\begin{itemize}
+    \item \textbf{Unimodal Baselines:} Weather-Only Random Forest, Fire-History-Only Random Forest, LandUse-Only Random Forest.
+    \item \textbf{Early Feature-Level Fusion:} Random Forest (150 trees, max depth 14), XGBoost (150 estimators, max depth 6, lr 0.08), LightGBM (150 estimators, max depth 7, lr 0.08).
+    \item \textbf{Late Decision-Level Fusion:} Dynamic Dempster-Shafer (DST), Weighted Soft-Voting ($0.45 p_w + 0.25 p_l + 0.30 p_s$), Meta-Learner Stacking (Logistic Regression meta-classifier).
+\end{itemize}
+
+% ------------------------------------------------------------------------------
+\section{Results and Empirical Analysis}
 \label{sec:results}
 % ------------------------------------------------------------------------------
 
-\subsection{Comparative Benchmark}
-Table~\ref{tab:model_comparison} summarizes the empirical performance across all nine evaluated configurations on the 2024--2025 test corpus.
+\subsection{Quantitative Performance Comparison (24h Lead Time)}
+Table~\ref{tab:model_comparison} reports the quantitative evaluation on the 2024--2025 out-of-time test corpus under an operational classification threshold of $\tau = 0.35$.
 
 \begin{table}[htbp]
 \centering
-\caption{Performance comparison between Unimodal Baselines, Early Feature-Level Fusion, and Late Decision-Level Fusion on the 2024--2025 Out-of-Time Test Set in the Brazilian Cerrado.}
+\caption{Comparative performance across Unimodal Baselines, Early Feature Fusion, and Late Evidential Decision Fusion on the 2024--2025 Out-of-Time Test Set (24h Lead Time).}
 \label{tab:model_comparison}
 \small
 \begin{tabular}{llcccccc}
 \toprule
-\textbf{Paradigm} & \textbf{Model Architecture} & \textbf{Acc} & \textbf{Prec} & \textbf{Recall} & \textbf{F1} & \textbf{ROC-AUC} & \textbf{PR-AUC} \\
+\textbf{Paradigm} & \textbf{Model Architecture} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{ROC-AUC} & \textbf{PR-AUC} \\
 \midrule
-Early Feature Fusion & Random Forest & \textbf{1.0000} & \textbf{1.0000} & \textbf{1.0000} & \textbf{1.0000} & \textbf{1.0000} & \textbf{1.0000} \\
-Late Decision Fusion & MetaLearner Stacking & 0.9998 & 0.9998 & 0.9987 & 0.9993 & 1.0000 & 1.0000 \\
-Early Feature Fusion & XGBoost & 0.9996 & 0.9980 & 0.9991 & 0.9986 & 1.0000 & 1.0000 \\
-Early Feature Fusion & LightGBM & 0.9990 & 0.9952 & 0.9971 & 0.9962 & 1.0000 & 1.0000 \\
-Late Decision Fusion & Weighted Soft-Voting & 0.9978 & 0.9998 & 0.9829 & 0.9913 & 1.0000 & 0.9998 \\
-Late Decision Fusion & Dempster-Shafer (DST) & 0.9892 & \textbf{1.0000} & 0.9141 & 0.9551 & 1.0000 & 1.0000 \\
-\midrule
-Single-Source Baseline & Weather-Only (INMET) & 0.9502 & 0.7206 & 0.9854 & 0.8324 & 0.9684 & 0.7237 \\
-Single-Source Baseline & Fire-History (INPE) & 0.8780 & 1.0000 & 0.0284 & 0.0552 & 0.5142 & 0.1504 \\
-Single-Source Baseline & LandUse-Only (MapBiomas) & 0.8745 & 0.0000 & 0.0000 & 0.0000 & 0.6545 & 0.1723 \\
+Early Feature Fusion & LightGBM & \textbf{0.9351} & 0.6414 & \textbf{0.7178} & \textbf{0.6774} & \textbf{0.9546} & \textbf{0.7143} \\
+Early Feature Fusion & XGBoost & 0.9350 & 0.6421 & 0.7123 & 0.6754 & \textbf{0.9546} & 0.7141 \\
+Early Feature Fusion & Random Forest & 0.9344 & 0.6388 & 0.7111 & 0.6730 & 0.9513 & 0.7074 \\
+Late Decision Fusion & MetaLearner Stacking & 0.9333 & 0.6637 & 0.6019 & 0.6313 & 0.9292 & 0.6621 \\
+Single-Source Baseline & FireHistoryOnly & 0.9219 & 0.5821 & 0.6259 & 0.6032 & 0.8974 & 0.5948 \\
+Late Decision Fusion & Weighted Soft-Voting & 0.9331 & 0.7060 & 0.5061 & 0.5895 & 0.9260 & 0.6561 \\
+Late Decision Fusion & Dempster-Shafer (DST) & 0.9299 & \textbf{0.7333} & 0.4111 & 0.5268 & 0.9268 & 0.6623 \\
+Single-Source Baseline & WeatherOnly & 0.9000 & 0.3434 & 0.0596 & 0.1015 & 0.8470 & 0.3061 \\
+Single-Source Baseline & LandUseOnly & 0.9051 & 0.0000 & 0.0000 & 0.0000 & 0.8101 & 0.2567 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The unimodal Weather-Only baseline achieves high recall ($0.9854$) but suffers from a critically low precision ($0.7206$), yielding $27.94\%$ false-positive predictions. Conversely, the Fire-History-Only baseline exhibits near-zero predictive power (Recall $0.0284$), underscoring the necessity of predictive feature fusion.
-
-Both Early Feature Fusion (XGBoost, Random Forest) and Late Evidential Fusion (Dempster-Shafer) eliminate false alarms while sustaining near-perfect recall. Notably, Dempster-Shafer fusion delivers zero false positives ($\text{Precision} = 1.0000$), validating its theoretical strength in filtering ambiguous environmental noise.
-
-\subsection{Explainability via TreeSHAP}
-Figure~1 presents the TreeSHAP summary plot for the XGBoost Early Fusion model. The feature importance hierarchy is predominantly driven by:
+\subsection{Analysis of Findings}
 \begin{enumerate}
-    \item $\text{FWI}_{\text{proxy}}$ (mean $|\text{SHAP}| = 2.34$);
-    \item The Fuel-Dryness Interaction index ($1.68$);
-    \item 7-day cumulative minimum humidity ($1.42$);
-    \item Flammability index of pasture formations ($1.18$).
+    \item \textbf{Failure of Unimodal Baselines:} Weather-only models exhibit virtually no discriminative recall ($0.0596$) and poor precision ($0.3434$), confirming that meteorological dryness is an insufficient condition for ignition. Land-use alone fails completely (F1 = $0.0000$), demonstrating that static vegetative flammability cannot capture temporal dynamics.
+    \item \textbf{Superiority of Early Feature Fusion:} LightGBM and XGBoost achieve the highest overall predictive utility (F1 $\approx 0.677$, ROC-AUC $= 0.9546$). Joint feature spaces allow gradient boosted trees to uncover complex split conditions (e.g., high wind gust $\times$ high pasture biomass $\times$ low lagged humidity).
+    \item \textbf{Evidential Conservatism of Dempster-Shafer:} Dempster-Shafer evidential fusion achieves the \textbf{highest precision among all models ($73.33\%$)}, outperforming XGBoost ($64.21\%$). By explicitly withholding commitment when sources conflict (represented by mass $m(\Omega)$), DST filters out spurious alarms, which is crucial for operational brigade deployment.
 \end{enumerate}
 
-\subsection{Cartographic Spatial Case Study}
-A spatial case study conducted during the peak drought of August--September 2024 reveals that the Weather-Only baseline overestimates wildfire danger uniformly across the entire state. In contrast, the Spatio-Temporal Fusion Framework accurately delineates high-risk corridors in the northern and southwestern agricultural-savanna transition zones of Goi\'as, aligning precisely with ground-truth satellite verifications.
+\subsection{Multi-Horizon Forecasting Degradation (24h, 48h, 72h)}
+Table~\ref{tab:multi_horizon} traces the multi-horizon predictive performance. As expected in atmospheric dynamics, evidential confidence gradually attenuates as the horizon expands: Dempster-Shafer ROC-AUC transitions from $0.9268$ (24h) to $0.9218$ (48h) and $0.9183$ (72h), while preserving its distinct precision superiority ($74.70\%$ at 72h).
 
-%
+\begin{table}[htbp]
+\centering
+\caption{Multi-Horizon Forecast Degradation (24h, 48h, and 72h Lead Times) for Early Fusion and Dempster-Shafer Late Fusion on the Out-of-Time Test Set.}
+\label{tab:multi_horizon}
+\small
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Lead Time} & \textbf{Model Architecture} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{ROC-AUC} \\
+\midrule
+\multirow{2}{*}{24h ($t+1$)} & Early Fusion (XGBoost) & 0.6421 & 0.7123 & 0.6754 & 0.9546 \\
+                             & Late Fusion (Dempster-Shafer) & \textbf{0.7333} & 0.4111 & 0.5268 & 0.9268 \\
+\midrule
+\multirow{2}{*}{48h ($t+2$)} & Early Fusion (XGBoost) & 0.6400 & 0.7088 & 0.6727 & 0.9547 \\
+                             & Late Fusion (Dempster-Shafer) & \textbf{0.7476} & 0.3916 & 0.5139 & 0.9218 \\
+\midrule
+\multirow{2}{*}{72h ($t+3$)} & Early Fusion (XGBoost) & 0.6416 & 0.7100 & 0.6741 & 0.9547 \\
+                             & Late Fusion (Dempster-Shafer) & \textbf{0.7470} & 0.3882 & 0.5109 & 0.9183 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Explainability via TreeSHAP}
+TreeSHAP global analysis (Figure~1 and Figure~2) highlights that the primary predictive drivers are: (i) antecedent fire detections $\text{FRP}_{\max}(t-1)$, (ii) consecutive dry days ($D_{\text{dry}}$), (iii) the $\text{FWI}_{\text{proxy}}$, and (iv) 7-day cumulative minimum humidity. Crucially, the non-linear interaction between low humidity and high pasture flammability shifts model log-odds abruptly toward fire occurrence.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/fig1_shap_summary_beeswarm.png}
+        \caption{TreeSHAP Beeswarm Plot.}
+        \label{fig:shap_beeswarm}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/fig2_shap_feature_importance_bar.png}
+        \caption{Feature Importance Ranking.}
+        \label{fig:shap_bar}
+    \end{subfigure}
+    \caption{TreeSHAP explainability on the 2024--2025 out-of-time test set for Early Fusion XGBoost (24h horizon).}
+    \label{fig:shap_all}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/fig3_roc_curves_comparison.png}
+        \caption{Receiver Operating Characteristic.}
+        \label{fig:roc}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/fig4_precision_recall_curves.png}
+        \caption{Precision-Recall Curves.}
+        \label{fig:pr}
+    \end{subfigure}
+    \caption{Discrimination performance across Unimodal Baselines and Information Fusion paradigms.}
+    \label{fig:curves}
+\end{figure}
+
+\subsection{Spatial Cartography and Error Dynamics}
+Figure~5 validates model predictions during the severe drought peak of August--September 2024 across Goi\'as and DF. While the Weather-Only baseline paints the entire territory with undifferentiated severe danger, Early Fusion and Dempster-Shafer delineate sharp risk corridors concentrated in the northern and southwestern agrarian-savanna transitions, matching the true active fire fronts. The normalized confusion matrices in Figure~6 confirm that evidential reasoning suppresses false-positive classifications.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/fig5_spatiotemporal_wildfire_risk_map_goias.png}
+    \caption{Cartographic validation of 24h wildfire risk across the State of Goi\'as and DF during the peak drought of August--September 2024.}
+    \label{fig:map}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.92\textwidth]{figures/fig6_confusion_matrices_comparison.png}
+    \caption{Normalized confusion matrices on the 2024--2025 out-of-time test set ($\tau = 0.35$).}
+    \label{fig:cm}
+\end{figure}
+
 % ------------------------------------------------------------------------------
-\section{Conclusion}
+\section{Conclusion and Future Work}
 \label{sec:conclusion}
 % ------------------------------------------------------------------------------
-This study presented a comprehensive Spatio-Temporal Information Fusion Framework for proactive wildfire risk forecasting in the Brazilian Cerrado, validated over a 10-year multi-source dataset (2016--2025). The results prove that multimodal fusion fundamentally overcomes the operational trade-offs of reactive satellites and alarmist weather baselines, providing emergency response agencies with highly reliable, zero-false-alarm predictive intelligence. Future extensions will incorporate optical/SAR satellite imagery embeddings and real-time streaming architectures.
+This study developed a reproducible Spatio-Temporal Information Fusion Framework and evidential benchmark for multi-horizon wildfire risk forecasting in the Brazilian Cerrado, eliminating temporal data leakage and establishing rigorous baselines across a 10-year horizon (2016--2025). The experimental results demonstrate that multimodal fusion decisively overcomes the limitations of isolated sensors: Early Fusion delivers superior balanced classification (F1 $= 0.6774$, ROC-AUC $= 0.9546$), while Dempster-Shafer evidential fusion maximizes precision ($73.33\%$ to $74.76\%$), drastically curtailing false alarms. Future work will investigate continuous spatial deep evidential neural networks and near-real-time optical/SAR satellite embeddings.
 
-%
-% ---- Bibliography ----
-%
+% ------------------------------------------------------------------------------
 \begin{thebibliography}{10}
+% ------------------------------------------------------------------------------
+\bibitem{pivello2021cerrado}
+Pivello, V.R., et~al.: Understanding the fire regime of the Cerrado: An overview. Ecology and Evolution \textbf{11}(12), 7087--7105 (2021)
+
 \bibitem{inpe2025}
-INPE: Programa Queimadas: Monitoramento dos focos ativos por sat\'elite. Instituto Nacional de Pesquisas Espaciais (2025). \url{https://queimadas.dpm.inpe.br/}
+INPE: Programa Queimadas: Monitoramento dos focos ativos por sat\'elite. Instituto Nacional de Pesquisas Espaciais, S\~ao Jos\'e dos Campos (2025). \url{https://queimadas.dpm.inpe.br/}
 
-\bibitem{inmet2025}
-INMET: Banco de Dados Meteorol\'ogicos para Ensino e Pesquisa. Instituto Nacional de Meteorologia, Bras\'ilia (2025). \url{https://portal.inmet.gov.br/}
+\bibitem{van2018fire}
+van Wagner, C.E.: Development and Structure of the Canadian Forest Fire Weather Index System. Canadian Forestry Service, Forestry Technical Report 35 (1987)
 
-\bibitem{mapbiomas2024}
-MapBiomas: Cole\c{c}\~ao 9 da Cobertura e Uso da Terra no Brasil. Projeto MapBiomas (2024). \url{https://mapbiomas.org/}
+\bibitem{hall2001handbook}
+Hall, D.L., Llinas, J. (eds.): Handbook of Multisensor Data Fusion. CRC Press, Boca Raton (2001)
 
 \bibitem{shafer1976}
 Shafer, G.: A Mathematical Theory of Evidence. Princeton University Press, Princeton (1976)
@@ -201,14 +292,33 @@ Shafer, G.: A Mathematical Theory of Evidence. Princeton University Press, Princ
 \bibitem{dempster1967}
 Dempster, A.P.: Upper and lower probabilities induced by a multivalued mapping. The Annals of Mathematical Statistics \textbf{38}(2), 325--339 (1967)
 
+\bibitem{smets1994transferable}
+Smets, P., Kennes, R.: The transferable belief model. Artificial Intelligence \textbf{66}(2), 191--234 (1994)
+
 \bibitem{lundberg2020}
 Lundberg, S.M., et~al.: From local explanations to global understanding with explainable AI for trees. Nature Machine Intelligence \textbf{2}(1), 56--67 (2020)
 
 \bibitem{chen2016xgboost}
-Chen, T., Guestrin, C.: XGBoost: A scalable tree boosting system. In: ACM SIGKDD, pp. 785--794 (2016)
+Chen, T., Guestrin, C.: XGBoost: A scalable tree boosting system. In: Proc. ACM SIGKDD, pp. 785--794 (2016)
+
+\bibitem{ke2017lightgbm}
+Ke, G., et~al.: LightGBM: A highly efficient gradient boosting decision tree. In: Advances in Neural Information Processing Systems (NeurIPS), pp. 3146--3154 (2017)
 
 \bibitem{breiman2001random}
 Breiman, L.: Random forests. Machine Learning \textbf{45}(1), 5--32 (2001)
 
+\bibitem{inmet2025}
+INMET: Banco de Dados Meteorol\'ogicos para Ensino e Pesquisa (BDMEP). Instituto Nacional de Meteorologia, Bras\'ilia (2025). \url{https://portal.inmet.gov.br/}
+
+\bibitem{mapbiomas2024}
+MapBiomas: Projeto MapBiomas -- Cole\c{c}\~ao 9 da Cobertura e Uso da Terra do Brasil (2024). \url{https://mapbiomas.org/}
+
+\bibitem{wolpert1992stacked}
+Wolpert, D.H.: Stacked generalization. Neural Networks \textbf{5}(2), 241--259 (1992)
+
+\bibitem{fernandez2018smote}
+Fern{\'a}ndez, A., et~al.: SMOTE for learning from imbalanced data: progress and challenges. Information Sciences \textbf{465}, 1--29 (2018)
+
 \end{thebibliography}
 \end{document}
+

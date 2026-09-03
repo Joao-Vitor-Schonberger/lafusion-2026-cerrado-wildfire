@@ -1,10 +1,10 @@
 Paradigm,Model Architecture,Accuracy,Precision,Recall,F1-Score,ROC-AUC,PR-AUC
-Early Feature Fusion,RandomForest,1.0,1.0,1.0,1.0,1.0,1.0
-Late Decision Fusion,MetaLearnerStacking,0.9998,0.9998,0.9987,0.9993,1.0,1.0
-Early Feature Fusion,XGBoost,0.9996,0.998,0.9991,0.9986,1.0,1.0
-Early Feature Fusion,LightGBM,0.999,0.9952,0.9971,0.9962,1.0,1.0
-Late Decision Fusion,WeightedSoftVoting,0.9978,0.9998,0.9829,0.9913,1.0,0.9998
-Late Decision Fusion,DempsterShafer,0.9892,1.0,0.9141,0.9551,1.0,1.0
-Single-Source Baseline,WeatherOnly,0.9502,0.7206,0.9854,0.8324,0.9684,0.7237
-Single-Source Baseline,FireHistoryOnly,0.878,1.0,0.0284,0.0552,0.5142,0.1504
-Single-Source Baseline,LandUseOnly,0.8745,0.0,0.0,0.0,0.6545,0.1723
+Early Feature Fusion,LightGBM,0.9351,0.6414,0.7178,0.6774,0.9546,0.7143
+Early Feature Fusion,XGBoost,0.935,0.6421,0.7123,0.6754,0.9546,0.7141
+Early Feature Fusion,RandomForest,0.9344,0.6388,0.7111,0.673,0.9513,0.7074
+Late Decision Fusion,MetaLearnerStacking,0.9333,0.6637,0.6019,0.6313,0.9292,0.6621
+Single-Source Baseline,FireHistoryOnly,0.9219,0.5821,0.6259,0.6032,0.8974,0.5948
+Late Decision Fusion,WeightedSoftVoting,0.9331,0.706,0.5061,0.5895,0.926,0.6561
+Late Decision Fusion,DempsterShafer,0.9299,0.7333,0.4111,0.5268,0.9268,0.6623
+Single-Source Baseline,WeatherOnly,0.9,0.3434,0.0596,0.1015,0.847,0.3061
+Single-Source Baseline,LandUseOnly,0.9051,0.0,0.0,0.0,0.8101,0.2567

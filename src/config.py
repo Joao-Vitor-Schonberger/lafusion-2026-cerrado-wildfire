@@ -61,8 +61,12 @@ GRID_RESOLUTION_DEG = 0.10
 RANDOM_SEED = 42
 
 # Target Variable and Severity Thresholds
-TARGET_COLUMN = "severe_fire_risk"
-CRITICAL_FRP_THRESHOLD = 50.0       # Fire Radiative Power (MW) for high severity
+TARGET_COLUMN = "severe_fire_risk_24h"   # Primary benchmark target: 24h ahead (t+1)
+TARGET_COLUMN_48H = "severe_fire_risk_48h" # 48h ahead (t+2)
+TARGET_COLUMN_72H = "severe_fire_risk_72h" # 72h ahead (t+3)
+HORIZONS = [1, 2, 3]                     # Lead times in days (24h, 48h, 72h)
+
+CRITICAL_FRP_THRESHOLD = 35.0       # Fire Radiative Power (MW) for severe classification
 CRITICAL_HUMIDITY_THRESHOLD = 20.0  # Relative Humidity (%) for extreme dryness
 CRITICAL_DAYS_WITHOUT_RAIN = 15     # Days without precipitation
 
@@ -73,6 +77,7 @@ TEST_YEARS = [2024, 2025]              # 2024-2025 (2 years out-of-time test set
 # Visuals & Figure Export Settings (Springer 300 DPI Standard)
 FIGURE_DPI = 300
 FIGURE_FORMAT = "pdf"  # Vectorial format for LaTeX / PNG for Word
+
 
 
 # ==============================================================================

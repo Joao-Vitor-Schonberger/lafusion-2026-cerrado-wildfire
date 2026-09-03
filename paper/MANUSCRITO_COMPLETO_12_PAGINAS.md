@@ -73,19 +73,30 @@ To overcome these challenges, this study introduces an end-to-end **Spatio-Tempo
 
 ## 3. Results & Empirical Benchmark
 
-### 3.1 Performance Comparison (Out-of-Time Test Set: 2024–2025)
+### 3.1 Performance Comparison (Out-of-Time Test Set: 2024–2025 | 24h Lead Time)
 
 | Paradigm | Model Architecture | Accuracy | Precision | Recall | F1-Score | ROC-AUC | PR-AUC |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Early Feature Fusion** | **Random Forest** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | **1.0000** | **1.0000** |
-| **Late Decision Fusion** | **MetaLearner Stacking** | **0.9998** | **0.9998** | **0.9987** | **0.9993** | **1.0000** | **1.0000** |
-| **Early Feature Fusion** | **XGBoost Classifier** | **0.9996** | **0.9980** | **0.9991** | **0.9986** | **1.0000** | **1.0000** |
-| **Early Feature Fusion** | **LightGBM Classifier** | **0.9990** | **0.9952** | **0.9971** | **0.9962** | **1.0000** | **1.0000** |
-| **Late Decision Fusion** | **Weighted Soft-Voting** | **0.9978** | **0.9998** | **0.9829** | **0.9913** | **1.0000** | **0.9998** |
-| **Late Decision Fusion** | **Dempster-Shafer (DST)** | **0.9892** | **1.0000** | **0.9141** | **0.9551** | **1.0000** | **1.0000** |
-| *Single-Source Baseline* | *Weather-Only (INMET)* | 0.9502 | 0.7206 | 0.9854 | 0.8324 | 0.9684 | 0.7237 |
-| *Single-Source Baseline* | *Fire-History (INPE)* | 0.8780 | 1.0000 | 0.0284 | 0.0552 | 0.5142 | 0.1504 |
-| *Single-Source Baseline* | *LandUse-Only (MapBiomas)* | 0.8745 | 0.0000 | 0.0000 | 0.0000 | 0.6545 | 0.1723 |
+| **Early Feature Fusion** | **LightGBM** | **0.9351** | 0.6414 | **0.7178** | **0.6774** | **0.9546** | **0.7143** |
+| **Early Feature Fusion** | **XGBoost Classifier** | 0.9350 | 0.6421 | 0.7123 | 0.6754 | **0.9546** | 0.7141 |
+| **Early Feature Fusion** | **Random Forest** | 0.9344 | 0.6388 | 0.7111 | 0.6730 | 0.9513 | 0.7074 |
+| **Late Decision Fusion** | **MetaLearner Stacking** | 0.9333 | 0.6637 | 0.6019 | 0.6313 | 0.9292 | 0.6621 |
+| *Single-Source Baseline* | *Fire-History-Only* | 0.9219 | 0.5821 | 0.6259 | 0.6032 | 0.8974 | 0.5948 |
+| **Late Decision Fusion** | **Weighted Soft-Voting** | 0.9331 | 0.7060 | 0.5061 | 0.5895 | 0.9260 | 0.6561 |
+| **Late Decision Fusion** | **Dempster-Shafer (DST)** | 0.9299 | **0.7333** | 0.4111 | 0.5268 | 0.9268 | 0.6623 |
+| *Single-Source Baseline* | *Weather-Only (INMET)* | 0.9000 | 0.3434 | 0.0596 | 0.1015 | 0.8470 | 0.3061 |
+| *Single-Source Baseline* | *LandUse-Only (MapBiomas)* | 0.9051 | 0.0000 | 0.0000 | 0.0000 | 0.8101 | 0.2567 |
+
+### 3.2 Multi-Horizon Forecasting Degradation (24h, 48h, 72h)
+
+| Lead Time | Model Architecture | Precision | Recall | F1-Score | ROC-AUC |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **24h ($t+1$)** | Early Fusion (XGBoost) | 0.6421 | 0.7123 | 0.6754 | 0.9546 |
+| **24h ($t+1$)** | Late Fusion (Dempster-Shafer) | **0.7333** | 0.4111 | 0.5268 | 0.9268 |
+| **48h ($t+2$)** | Early Fusion (XGBoost) | 0.6400 | 0.7088 | 0.6727 | 0.9547 |
+| **48h ($t+2$)** | Late Fusion (Dempster-Shafer) | **0.7476** | 0.3916 | 0.5139 | 0.9218 |
+| **72h ($t+3$)** | Early Fusion (XGBoost) | 0.6416 | 0.7100 | 0.6741 | 0.9547 |
+| **72h ($t+3$)** | Late Fusion (Dempster-Shafer) | **0.7470** | 0.3882 | 0.5109 | 0.9183 |
 
 ---
 
@@ -110,9 +121,10 @@ To overcome these challenges, this study introduces an end-to-end **Spatio-Tempo
 *Figure 5: Spatial risk forecast across Goiás and DF during the 2024 peak drought period.*
 
 ![Confusion Matrices](figures/fig6_confusion_matrices_comparison.png)  
-*Figure 6: Normalized Confusion Matrices demonstrating zero false alarms under Information Fusion.*
+*Figure 6: Normalized Confusion Matrices demonstrating evidential suppression of false alarms under Information Fusion.*
 
 ---
 
 ## 5. Conclusion
-This research demonstrates that fusing satellite remote sensing, meteorological surface stations, and vegetation fuel characteristics fundamentally resolves the long-standing trade-off between satellite detection latency and meteorological false-alarm rates. The resulting framework provides environmental defense and civil protection agencies with robust, explainable, and zero-false-alarm predictive intelligence.
+This research demonstrates that fusing meteorological surface stations, land use flammability, and antecedent thermal satellite memory fundamentally resolves the trade-off between satellite detection latency and meteorological false-alarm rates. Early Feature Fusion delivers superior balance (F1 = 0.6774, ROC-AUC = 0.9546), while Dempster-Shafer evidential fusion maximizes precision (73.33% to 74.76%), filtering false positives for civil protection agencies.
+

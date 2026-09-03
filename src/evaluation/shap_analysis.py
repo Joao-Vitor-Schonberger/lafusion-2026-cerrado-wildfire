@@ -50,7 +50,11 @@ def run_shap_analysis():
     print(f"1. Carregando dados para análise SHAP: {input_file}")
     df = pd.read_csv(input_file)
 
-    exclude_cols = ["cell_id", "data", "classe_uso_solo", "estacao_mais_proxima", TARGET_COLUMN]
+    exclude_cols = [
+        "cell_id", "data", "classe_uso_solo", "estacao_mais_proxima",
+        "num_focos_satelite", "frp_max_mw", "frp_soma_mw",
+        "severe_fire_risk_24h", "severe_fire_risk_48h", "severe_fire_risk_72h"
+    ]
     feature_cols = [c for c in df.columns if c not in exclude_cols]
 
     df_train = df[df["ano"].isin(TRAIN_YEARS)].copy().reset_index(drop=True)
@@ -64,7 +68,7 @@ def run_shap_analysis():
     df_test_sample = df_test.sample(n=sample_size, random_state=RANDOM_SEED).reset_index(drop=True)
     X_test_sample = df_test_sample[feature_cols].values
 
-    print(f"2. Treinando XGBoost Early Fusion para extração dos SHAP Values...")
+    print(f"2. Treinando XGBoost Early Fusion para extração dos SHAP Values (24h Ahead)...")
     model = XGBClassifier(
         n_estimators=150,
         max_depth=6,
@@ -87,6 +91,7 @@ def run_shap_analysis():
         "combustivel_secura_interacao": "Fuel-Dryness Interaction Index",
         "umid_min_pct": "Daily Min Relative Humidity (%)",
         "umid_min_mean_7d": "7-Day Mean Min Humidity (%)",
+        "umid_min_mean_3d": "3-Day Mean Min Humidity (%)",
         "dias_sem_chuva": "Consecutive Dry Days (DSR)",
         "dias_sem_chuva_log": "Log(Consecutive Dry Days)",
         "vento_rajada_ms": "Max Wind Gust Speed (m/s)",
@@ -97,13 +102,15 @@ def run_shap_analysis():
         "biomassa_combustivel_t_ha": "Fuel Biomass Density (t/ha)",
         "dist_estrada_km": "Distance to Road/Crop Edge (km)",
         "exposicao_antropica": "Anthropic Exposure Index",
-        "num_focos_satelite": "Satellite Thermal Detections",
-        "frp_max_mw": "Max Fire Radiative Power (MW)",
-        "frp_soma_mw": "Sum Fire Radiative Power (MW)",
+        "focos_satelite_lag1": "Antecedent Fire Detections (t-1)",
+        "focos_acum_3d": "3-Day Cumulative Fire Memory",
+        "frp_max_lag1": "Antecedent Max FRP (MW, t-1)",
         "precipitacao_mm": "Daily Precipitation (mm)",
         "precipitacao_acum_7d": "7-Day Accumulated Rain (mm)",
+        "dist_estacao_km": "Distance to Weather Station (km)",
         "classe_id": "Land Cover Class ID",
     }
+
 
     display_names = [friendly_feature_names.get(c, c) for c in feature_cols]
     df_display = pd.DataFrame(X_test_sample, columns=display_names)

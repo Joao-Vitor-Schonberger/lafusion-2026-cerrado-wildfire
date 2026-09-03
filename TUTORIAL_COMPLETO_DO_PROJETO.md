@@ -126,15 +126,16 @@ Treinamos os modelos com dados de **2016 a 2023 (8 anos)** e testamos em **2024 
 
 Veja a tabela oficial de resultados científicos:
 
-| Paradigma | Modelo | Acurácia | Precisão | Recall (Sensibilidade) | F1-Score (Equilíbrio) | O que isso significa na prática? |
-| :--- | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Early Fusion** | **Random Forest** | **100%** | **100%** | **100%** | **1.0000** | **Perfeição:** Previu todos os incêndios sem nenhum falso alarme. |
-| **Late Fusion** | **Meta-Learner** | **99,9%** | **99,9%** | **99,8%** | **0.9993** | Fusão por aprendizado com altíssima precisão. |
-| **Early Fusion** | **XGBoost** | **99,9%** | **99,8%** | **99,9%** | **0.9986** | Rápido, leve e com explicabilidade SHAP exata. |
-| **Late Fusion** | **Dempster-Shafer** | **98,9%** | **100%** | **91,4%** | **0.9551** | **Zero falso alarme:** Toda vez que alertou, era fogo real. |
-| *Baseline* | *Só Clima (INMET)* | 95,0% | **72,0%** | 98,5% | 0.8324 | **Ruim:** Errou 28% das vezes, dando milhares de alarmes falsos. |
-| *Baseline* | *Só Satélite (INPE)* | 87,8% | 100% | **2,8%** | 0.0552 | **Péssimo:** Só detectou 2% dos fogos com antecedência (reativo). |
-| *Baseline* | *Só Solo (MapBiomas)* | 87,4% | 0% | 0% | 0.0000 | **Inútil isoladamente:** O solo sozinho não prevê quando vai queimar. |
+| Paradigma | Modelo | Acurácia | Precisão | Recall (Sensibilidade) | F1-Score (Equilíbrio) | ROC-AUC | O que isso significa na prática? |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Early Fusion** | **LightGBM** | **93,5%** | 64,1% | **71,8%** | **0.6774** | **0.9546** | **Melhor Equilíbrio:** Combina clima e solo com máxima eficácia preditiva. |
+| **Early Fusion** | **XGBoost** | 93,5% | 64,2% | 71,2% | **0.6754** | **0.9546** | Rápido, robusto e com explicabilidade TreeSHAP direta. |
+| **Early Fusion** | **Random Forest** | 93,4% | 63,9% | 71,1% | **0.6730** | 0.9513 | Ensemble estável de árvores de decisão. |
+| **Late Fusion** | **Meta-Learner** | 93,3% | 66,4% | 60,2% | 0.6313 | 0.9292 | Stacking logístico sobre as decisões dos especialistas. |
+| *Baseline* | *Só Fogo Passado* | 92,2% | 58,2% | 62,6% | 0.6032 | 0.8974 | Memória de queimadas dos dias anteriores. |
+| **Late Fusion** | **Dempster-Shafer** | 93,0% | **73,3%** | 41,1% | 0.5268 | 0.9268 | **Menor taxa de falso alarme:** Prioriza certeza antes do alarme. |
+| *Baseline* | *Só Clima (INMET)* | 90,0% | 34,3% | 6,0% | 0.1015 | 0.8470 | **Insuficiente sozinho:** Ar seco não basta para ignição sem combustível. |
+| *Baseline* | *Só Solo (MapBiomas)* | 90,5% | 0% | 0% | 0.0000 | 0.8101 | **Inútil isoladamente:** O solo estático não prevê quando haverá fogo. |
 
 ---
 

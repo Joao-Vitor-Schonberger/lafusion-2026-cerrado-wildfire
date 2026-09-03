@@ -1,0 +1,7 @@
+Horizon,Model,Precision,Recall,F1-Score,ROC-AUC
+24h (t+1),Early Fusion (XGBoost),0.6421,0.7123,0.6754,0.9546
+24h (t+1),Late Fusion (Dempster-Shafer),0.7333,0.4111,0.5268,0.9268
+48h (t+2),Early Fusion (XGBoost),0.64,0.7088,0.6727,0.9547
+48h (t+2),Late Fusion (Dempster-Shafer),0.7476,0.3916,0.5139,0.9218
+72h (t+3),Early Fusion (XGBoost),0.6416,0.71,0.6741,0.9547
+72h (t+3),Late Fusion (Dempster-Shafer),0.747,0.3882,0.5109,0.9183

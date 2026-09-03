@@ -114,9 +114,9 @@ def generate_spatial_maps_and_matrices():
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5))
 
     models_cm = [
-        ("Baseline_WeatherOnly", "A) Baseline: Weather-Only", 0.40),
-        ("LateFusion_DempsterShafer", "B) Late Fusion: Dempster-Shafer", 0.40),
-        ("EarlyFusion_XGBoost", "C) Early Fusion: XGBoost", 0.40),
+        ("Baseline_WeatherOnly", "A) Baseline: Weather-Only", 0.35),
+        ("LateFusion_DempsterShafer", "B) Late Fusion: Dempster-Shafer", 0.35),
+        ("EarlyFusion_XGBoost", "C) Early Fusion: XGBoost", 0.35),
     ]
 
     y_true = df["ground_truth"].values

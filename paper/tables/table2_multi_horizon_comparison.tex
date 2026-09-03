@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\caption{Multi-Horizon Forecast Degradation (24h, 48h, and 72h Lead Times) for Early Fusion and Dempster-Shafer Late Fusion.}
+\label{tab:multi_horizon}
+\begin{tabular}{llrrrr}
+\toprule
+Horizon & Model & Precision & Recall & F1-Score & ROC-AUC \\
+\midrule
+24h (t+1) & Early Fusion (XGBoost) & 0.642100 & 0.712300 & 0.675400 & 0.954600 \\
+24h (t+1) & Late Fusion (Dempster-Shafer) & 0.733300 & 0.411100 & 0.526800 & 0.926800 \\
+48h (t+2) & Early Fusion (XGBoost) & 0.640000 & 0.708800 & 0.672700 & 0.954700 \\
+48h (t+2) & Late Fusion (Dempster-Shafer) & 0.747600 & 0.391600 & 0.513900 & 0.921800 \\
+72h (t+3) & Early Fusion (XGBoost) & 0.641600 & 0.710000 & 0.674100 & 0.954700 \\
+72h (t+3) & Late Fusion (Dempster-Shafer) & 0.747000 & 0.388200 & 0.510900 & 0.918300 \\
+\bottomrule
+\end{tabular}
+\end{table}

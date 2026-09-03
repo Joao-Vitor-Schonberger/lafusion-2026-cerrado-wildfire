@@ -68,15 +68,11 @@ class LateDecisionFusion:
         ]
 
         self.satellite_features = [
-            "num_focos_satelite", "frp_max_mw", "frp_soma_mw"
+            "focos_satelite_lag1", "focos_satelite_lag2", "focos_acum_3d",
+            "frp_max_lag1", "frp_soma_lag1"
         ]
 
-        # Reliability factors (alphas) for Dempster-Shafer Evidence Theory
-        self.alpha_weather = 0.88
-        self.alpha_landuse = 0.78
-        self.alpha_satellite = 0.92
-
-    def fit(self, df_train, target_col="severe_fire_risk"):
+    def fit(self, df_train, target_col="severe_fire_risk_24h"):
         """Train the 3 domain specialists and fit the Meta-Learner."""
         y_train = df_train[target_col].values
 
@@ -94,33 +90,48 @@ class LateDecisionFusion:
         self.meta_learner.fit(X_meta_train, y_train)
         return self
 
-    def predict_proba(self, df_test):
-        """Generates fused decision probabilities via Soft-Voting, Dempster-Shafer, and Stacking."""
+    def predict_proba(self, df_test, horizon=1):
+        """
+        Generates fused decision probabilities via Soft-Voting, Dempster-Shafer (DST), and Stacking.
+        DST applies dynamic evidential discounting based on physical distance to weather stations
+        and temporal lag decay.
+        """
         p_w = self.expert_weather.predict_proba(df_test[self.weather_features].values)[:, 1]
         p_l = self.expert_landuse.predict_proba(df_test[self.landuse_features].values)[:, 1]
         p_s = self.expert_satellite.predict_proba(df_test[self.satellite_features].values)[:, 1]
 
-        # 1. Weighted Soft-Voting Fusion (heuristic weights: 0.40 weather, 0.25 landuse, 0.35 satellite)
-        proba_soft_voting = (0.40 * p_w) + (0.25 * p_l) + (0.35 * p_s)
+        # 1. Weighted Soft-Voting Fusion (heuristic weights: 0.45 weather, 0.25 landuse, 0.30 satellite)
+        proba_soft_voting = (0.45 * p_w) + (0.25 * p_l) + (0.30 * p_s)
 
         # 2. Meta-Learner Stacking Fusion
         X_meta_test = np.column_stack([p_w, p_l, p_s])
         proba_stacking = self.meta_learner.predict_proba(X_meta_test)[:, 1]
 
-        # 3. Dempster-Shafer Evidence Theory Fusion (DST)
+        # 3. Dynamic Dempster-Shafer Evidence Theory Fusion (DST)
+        # Spatial discounting: weather confidence decays with distance from physical station
+        if "dist_estacao_km" in df_test.columns:
+            dist_km = df_test["dist_estacao_km"].values
+            alpha_w_dynamic = np.clip(0.92 * np.exp(-dist_km / 150.0), 0.50, 0.95)
+        else:
+            alpha_w_dynamic = np.full(len(df_test), 0.88)
+
+        # Temporal discounting for satellite memory across horizons
+        alpha_s_dynamic = np.full(len(df_test), max(0.65, 0.90 * np.exp(-0.20 * (horizon - 1))))
+        alpha_l = 0.82
+
         dst_probs = []
-        for pw_i, pl_i, ps_i in zip(p_w, p_l, p_s):
+        for pw_i, pl_i, ps_i, aw_i, as_i in zip(p_w, p_l, p_s, alpha_w_dynamic, alpha_s_dynamic):
             # Form BBAs for each source
-            m_w = (self.alpha_weather * pw_i, self.alpha_weather * (1.0 - pw_i), 1.0 - self.alpha_weather)
-            m_l = (self.alpha_landuse * pl_i, self.alpha_landuse * (1.0 - pl_i), 1.0 - self.alpha_landuse)
-            m_s = (self.alpha_satellite * ps_i, self.alpha_satellite * (1.0 - ps_i), 1.0 - self.alpha_satellite)
+            m_w = (aw_i * pw_i, aw_i * (1.0 - pw_i), 1.0 - aw_i)
+            m_l = (alpha_l * pl_i, alpha_l * (1.0 - pl_i), 1.0 - alpha_l)
+            m_s = (as_i * ps_i, as_i * (1.0 - ps_i), 1.0 - as_i)
 
             # Combine source 1 and 2
             m_wl = dempster_shafer_combine_two(m_w, m_l)
             # Combine result with source 3
             m_final = dempster_shafer_combine_two(m_wl, m_s)
 
-            # Pignistic probability: BetP(Fire) = m(Fire) + 0.5 * m(Omega)
+            # Pignistic transformation: BetP(Fire) = m(Fire) + 0.5 * m(Omega)
             bet_p_fire = m_final[0] + 0.5 * m_final[2]
             dst_probs.append(bet_p_fire)
 
@@ -131,3 +142,4 @@ class LateDecisionFusion:
             "LateFusion_MetaLearnerStacking": proba_stacking,
             "LateFusion_DempsterShafer": proba_dempster_shafer,
         }
+

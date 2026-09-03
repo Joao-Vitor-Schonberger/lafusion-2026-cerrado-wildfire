@@ -1,19 +1,19 @@
 \begin{table}[htbp]
-\caption{Performance comparison between Unimodal Baselines, Early Feature-Level Fusion, and Late Decision-Level Fusion on the 2024-2025 Out-of-Time Test Set in the Brazilian Cerrado.}
+\caption{Comparative performance across Unimodal Baselines, Early Feature Fusion, and Late Evidential Decision Fusion on the 2024--2025 Out-of-Time Test Set (24h Lead Time).}
 \label{tab:model_comparison}
 \begin{tabular}{llrrrrrr}
 \toprule
 Paradigm & Model Architecture & Accuracy & Precision & Recall & F1-Score & ROC-AUC & PR-AUC \\
 \midrule
-Early Feature Fusion & RandomForest & 1.000000 & 1.000000 & 1.000000 & 1.000000 & 1.000000 & 1.000000 \\
-Late Decision Fusion & MetaLearnerStacking & 0.999800 & 0.999800 & 0.998700 & 0.999300 & 1.000000 & 1.000000 \\
-Early Feature Fusion & XGBoost & 0.999600 & 0.998000 & 0.999100 & 0.998600 & 1.000000 & 1.000000 \\
-Early Feature Fusion & LightGBM & 0.999000 & 0.995200 & 0.997100 & 0.996200 & 1.000000 & 1.000000 \\
-Late Decision Fusion & WeightedSoftVoting & 0.997800 & 0.999800 & 0.982900 & 0.991300 & 1.000000 & 0.999800 \\
-Late Decision Fusion & DempsterShafer & 0.989200 & 1.000000 & 0.914100 & 0.955100 & 1.000000 & 1.000000 \\
-Single-Source Baseline & WeatherOnly & 0.950200 & 0.720600 & 0.985400 & 0.832400 & 0.968400 & 0.723700 \\
-Single-Source Baseline & FireHistoryOnly & 0.878000 & 1.000000 & 0.028400 & 0.055200 & 0.514200 & 0.150400 \\
-Single-Source Baseline & LandUseOnly & 0.874500 & 0.000000 & 0.000000 & 0.000000 & 0.654500 & 0.172300 \\
+Early Feature Fusion & LightGBM & 0.935100 & 0.641400 & 0.717800 & 0.677400 & 0.954600 & 0.714300 \\
+Early Feature Fusion & XGBoost & 0.935000 & 0.642100 & 0.712300 & 0.675400 & 0.954600 & 0.714100 \\
+Early Feature Fusion & RandomForest & 0.934400 & 0.638800 & 0.711100 & 0.673000 & 0.951300 & 0.707400 \\
+Late Decision Fusion & MetaLearnerStacking & 0.933300 & 0.663700 & 0.601900 & 0.631300 & 0.929200 & 0.662100 \\
+Single-Source Baseline & FireHistoryOnly & 0.921900 & 0.582100 & 0.625900 & 0.603200 & 0.897400 & 0.594800 \\
+Late Decision Fusion & WeightedSoftVoting & 0.933100 & 0.706000 & 0.506100 & 0.589500 & 0.926000 & 0.656100 \\
+Late Decision Fusion & DempsterShafer & 0.929900 & 0.733300 & 0.411100 & 0.526800 & 0.926800 & 0.662300 \\
+Single-Source Baseline & WeatherOnly & 0.900000 & 0.343400 & 0.059600 & 0.101500 & 0.847000 & 0.306100 \\
+Single-Source Baseline & LandUseOnly & 0.905100 & 0.000000 & 0.000000 & 0.000000 & 0.810100 & 0.256700 \\
 \bottomrule
 \end{tabular}
 \end{table}

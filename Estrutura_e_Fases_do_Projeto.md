@@ -26,16 +26,16 @@ O projeto combina **Engenharia de Dados**, **Ciência de Dados (Machine Learning
                     ┌──────────────────────────────────────────────┐
                     │  FASE 2: ENGENHARIA DE DADOS (CONCLUÍDA)     │
                     │ - Limpeza & Tratamento de Nulos (0 NaNs)     │
-                    │ - Grade Espaço-Temporal: 222.833 registros   │
-                    │ - 45 Features Multimodais + Target Severo    │
+                    │ - Grade Espaço-Temporal: 222.650 registros   │
+                    │ - Alvos Multi-Horizonte (24h, 48h, 72h)      │
                     └──────────────────────┬───────────────────────┘
                                            ▼
                     ┌──────────────────────────────────────────────┐
                     │  FASE 3: MODELAGEM E FUSÃO (CONCLUÍDA)       │
-                    │ - 3 Baselines: Clima (72% Prec), Fogo, Solo  │
-                    │ - Early Fusion: XGBoost, LightGBM, RF (100%) │
-                    │ - Late Fusion: Dempster-Shafer (95.5% F1),   │
-                    │   Soft-Voting (99.1% F1), Stacking (99.9% F1)│
+                    │ - 3 Baselines: Clima (10% F1), Fogo, Solo    │
+                    │ - Early Fusion: LightGBM (67.7% F1, 95% AUC) │
+                    │ - Late Fusion: Dempster-Shafer (73.3% Prec), │
+                    │   Soft-Voting (70.6% Prec), Stacking (63% F1)│
                     └──────────────────────┬───────────────────────┘
                                            ▼
                     ┌──────────────────────────────────────────────┐
@@ -46,6 +46,7 @@ O projeto combina **Engenharia de Dados**, **Ciência de Dados (Machine Learning
                     │   (300 DPI PNG & PDF vetorial em paper/fig/) │
                     └──────────────────────┬───────────────────────┘
                                            ▼
+
                     ┌──────────────────────────────────────────────┐
                     │  FASE 5: REDAÇÃO E SUBMISSÃO (CONCLUÍDA)     │
                     │ - Template Springer CCIS (LaTeX & Markdown)  │

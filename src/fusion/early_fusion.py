@@ -46,10 +46,14 @@ class EarlyFeatureFusion:
 
         self.feature_cols = None
 
-    def fit(self, df_train, target_col="severe_fire_risk", exclude_cols=None):
+    def fit(self, df_train, target_col="severe_fire_risk_24h", exclude_cols=None):
         """Fit all early fusion classifiers on the joint multimodal feature matrix."""
         if exclude_cols is None:
-            exclude_cols = ["cell_id", "data", "classe_uso_solo", "estacao_mais_proxima", target_col]
+            exclude_cols = [
+                "cell_id", "data", "classe_uso_solo", "estacao_mais_proxima",
+                "num_focos_satelite", "frp_max_mw", "frp_soma_mw",
+                "severe_fire_risk_24h", "severe_fire_risk_48h", "severe_fire_risk_72h"
+            ]
 
         self.feature_cols = [c for c in df_train.columns if c not in exclude_cols]
         X_train = df_train[self.feature_cols].values

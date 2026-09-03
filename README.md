@@ -122,16 +122,34 @@ python src/config.py
 
 ---
 
-## 🗓️ 5. Research Phases & Roadmap
+## 🗓️ 5. Research Phases & Execution Status
 
 | Phase | Description | Status |
 | :--- | :--- | :--- |
-| **Phase 1** | Planning, Software Architecture, Directory Setup & Configuration | **Completed** |
-| **Phase 2** | Data Engineering: Ingestion (INPE, INMET, MapBiomas) & Grid Alignment | **Next Step** |
-| **Phase 3** | Model Development: Baselines, Early Fusion & Late (Dempster-Shafer) Fusion | Pending |
-| **Phase 4** | Scientific Experimentation: Temporal CV, Metrics & SHAP Explainability | Pending |
-| **Phase 5** | Technical Paper Authoring (Springer CCIS 12-page format in English) | Pending |
-| **Phase 6** | Quality Assurance (Double-Blind Audit) & Microsoft CMT Submission | Pending (Deadline: 04/09/2026) |
+| **Phase 1** | Software Architecture, Directory Setup & Central Configuration | **Completed** |
+| **Phase 2** | Data Engineering: Clean Ingestion, 0.10° Grid Alignment & Multi-Horizon Targets (Zero Leakage) | **Completed** |
+| **Phase 3** | Fusion Modeling: 3 Baselines, Early Fusion (XGBoost, LightGBM, RF) & Dynamic Dempster-Shafer | **Completed** |
+| **Phase 4** | Empirical Benchmark: 24h, 48h, 72h Horizons, TreeSHAP & 300 DPI Publication Visuals | **Completed** |
+| **Phase 5** | Scientific Manuscript: Springer CCIS LNCS LaTeX Draft & Empirical Discussion | **Completed** |
+| **Phase 6** | Quality Assurance (Double-Blind Audit) & Submission Preparation (Deadline: 04/09/2026) | **Ready** |
+
+---
+
+## 📊 6. Benchmark Results Summary (Out-of-Time Test Set: 2024–2025)
+
+### 24h Proactive Forecasting Lead Time
+| Paradigm | Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC | PR-AUC |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Early Fusion** | **LightGBM** | **0.9351** | 0.6414 | **0.7178** | **0.6774** | **0.9546** | **0.7143** |
+| **Early Fusion** | **XGBoost** | 0.9350 | 0.6421 | 0.7123 | 0.6754 | **0.9546** | 0.7141 |
+| **Early Fusion** | **Random Forest** | 0.9344 | 0.6388 | 0.7111 | 0.6730 | 0.9513 | 0.7074 |
+| **Late Fusion** | **MetaLearner Stacking** | 0.9333 | 0.6637 | 0.6019 | 0.6313 | 0.9292 | 0.6621 |
+| *Baseline* | *Fire-History-Only* | 0.9219 | 0.5821 | 0.6259 | 0.6032 | 0.8974 | 0.5948 |
+| **Late Fusion** | **Weighted Soft-Voting** | 0.9331 | 0.7060 | 0.5061 | 0.5895 | 0.9260 | 0.6561 |
+| **Late Fusion** | **Dempster-Shafer (DST)** | 0.9299 | **0.7333** | 0.4111 | 0.5268 | 0.9268 | 0.6623 |
+| *Baseline* | *Weather-Only* | 0.9000 | 0.3434 | 0.0596 | 0.1015 | 0.8470 | 0.3061 |
+| *Baseline* | *LandUse-Only* | 0.9051 | 0.0000 | 0.0000 | 0.0000 | 0.8101 | 0.2567 |
+
 
 ---
 

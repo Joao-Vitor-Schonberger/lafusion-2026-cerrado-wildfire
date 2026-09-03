@@ -75,10 +75,19 @@ def align_spatiotemporal_grid():
         sampled_cells.loc[idx, "nearest_station"] = dists[0][0]
         sampled_cells.loc[idx, "station_distance_km"] = dists[0][1]
 
-    # Pre-index fires by date and spatial bin for rapid lookup
-    df_fires["lat_bin"] = np.round(df_fires["latitude"], 1)
-    df_fires["lon_bin"] = np.round(df_fires["longitude"], 1)
-    fires_grouped = df_fires.groupby(["data", "lat_bin", "lon_bin"]).agg(
+    # Mapear cada foco de satélite para a célula de grade mais próxima via cKDTree
+    from scipy.spatial import cKDTree
+    cell_coords = sampled_cells[["grid_lat", "grid_lon"]].values
+    tree = cKDTree(cell_coords)
+
+    dists_deg, indices = tree.query(df_fires[["latitude", "longitude"]].values)
+    df_fires["nearest_cell_id"] = sampled_cells.iloc[indices]["cell_id"].values
+    df_fires["dist_to_cell_km"] = dists_deg * 111.0
+
+    # Considera os focos dentro do raio de abrangência da célula (~65 km)
+    df_fires_mapped = df_fires[df_fires["dist_to_cell_km"] <= 65.0]
+
+    fires_grouped = df_fires_mapped.groupby(["data", "nearest_cell_id"]).agg(
         num_focos=("frp_mw", "count"),
         frp_max=("frp_mw", "max"),
         frp_soma=("frp_mw", "sum")
@@ -86,7 +95,7 @@ def align_spatiotemporal_grid():
 
     # Index weather by date and station
     weather_dict = df_weather.set_index(["data", "estacao_codigo"]).to_dict("index")
-    fires_dict = fires_grouped.set_index(["data", "lat_bin", "lon_bin"]).to_dict("index")
+    fires_dict = fires_grouped.set_index(["data", "nearest_cell_id"]).to_dict("index")
 
     # Generate all daily dates across 10 years (2016-2025)
     all_dates = []
@@ -124,13 +133,13 @@ def align_spatiotemporal_grid():
             else:
                 t_max, t_mean, umid_min, umid_mean, vento_vel, vento_raj, precip, dias_sem_chuva = 30.0, 24.0, 40.0, 60.0, 2.5, 6.0, 0.0, 0
 
-            # Fire lookup
-            f_key = (d_str, round(c_lat, 1), round(c_lon, 1))
-            f_data = fires_dict.get(f_key, None)
+            # Fire lookup direto por (data, cell_id)
+            f_data = fires_dict.get((d_str, c_id), None)
 
             num_focos = f_data["num_focos"] if f_data else 0
             frp_max = f_data["frp_max"] if f_data else 0.0
             frp_soma = f_data["frp_soma"] if f_data else 0.0
+
 
             aligned_rows.append({
                 "cell_id": c_id,

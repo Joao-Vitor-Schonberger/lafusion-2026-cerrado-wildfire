@@ -26,7 +26,8 @@ class UnimodalBaselines:
         ]
 
         self.fire_history_features = [
-            "num_focos_satelite", "frp_max_mw", "frp_soma_mw"
+            "focos_satelite_lag1", "focos_satelite_lag2", "focos_acum_3d",
+            "frp_max_lag1", "frp_soma_lag1"
         ]
 
         self.landuse_features = [
@@ -34,7 +35,7 @@ class UnimodalBaselines:
             "dist_estrada_km", "exposicao_antropica"
         ]
 
-    def fit(self, df_train, target_col="severe_fire_risk"):
+    def fit(self, df_train, target_col="severe_fire_risk_24h"):
         """Train all three single-source baseline models."""
         y_train = df_train[target_col].values
 
