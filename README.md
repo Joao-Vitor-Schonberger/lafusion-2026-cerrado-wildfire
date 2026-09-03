@@ -105,7 +105,7 @@ LaFusion/
 ### Installation
 ```bash
 # 1. Clone or navigate to the repository directory
-cd "C:\Users\joaos\OneDrive\Documentos\2026\01_Academico_e_UFG\Trabalhos\LaFusion"
+cd "C:\your_directory"
 
 # 2. Create and activate a Python virtual environment (optional)
 python -m venv venv
